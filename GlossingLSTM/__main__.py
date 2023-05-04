@@ -37,7 +37,7 @@ def train_window_model(lang: str, window_size: int, batch_size=64, patience=2, l
     train_args = [
         "fairseq-train",
         f"{preprocess_folder}",
-        "--arch", "transformer",
+        "--arch", "lstm",
         "--optimizer", "adam",
         "--lr", f"{lr}",
         "--seed", f"{window_size}",
@@ -90,7 +90,7 @@ def train_stemmer(lang: str, batch_size=64, patience=2, lr=0.003):
     train_args = [
         "fairseq-train",
         f"{preprocess_folder}",
-        "--arch", "transformer",
+        "--arch", "lstm",
         "--optimizer", "adam",
         "--lr", f"{lr}",
         "--lr-scheduler", "inverse_sqrt",
