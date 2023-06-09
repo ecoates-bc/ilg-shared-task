@@ -15,3 +15,4 @@ RUN python3 -m pip install -r requirements.txt
 COPY data data
 COPY GlossingLSTM GlossingLSTM
 COPY baseline baseline
+COPY ./docker-entrypoint.sh .

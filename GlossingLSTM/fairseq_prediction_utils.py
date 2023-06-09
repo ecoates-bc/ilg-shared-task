@@ -45,8 +45,12 @@ def get_sentence_level_predictions(output_texts: list, stem_output: str, dataset
                 best_match = vote_on_best_matches(ensemble_matches)
                 predicted_gloss.append(best_match.replace(" ", ""))
             total_token_counter += 1
-        sentence_stems = next(stems)
-        output_gloss = create_sentence_level_gloss(predicted_gloss, sentence_stems)
+
+        if stem_output:
+            sentence_stems = next(stems)
+            output_gloss = create_sentence_level_gloss(predicted_gloss, sentence_stems)
+        else:
+            output_gloss = create_sentence_level_gloss(predicted_gloss, "")
         output_sentences.append(output_gloss)
 
     return output_sentences
@@ -75,11 +79,6 @@ def create_sentence_level_gloss(gloss_tokens: list, predicted_stems: list) -> st
                 output.append(gloss_tokens[i])
         else:
             output.append(gloss_tokens[i])
-
-    print(gloss_tokens)
-    print(predicted_stems)
-    print(output)
-    print()
 
     return " ".join(output)
 

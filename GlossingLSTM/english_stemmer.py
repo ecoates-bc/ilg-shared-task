@@ -14,14 +14,22 @@ class EnglishStemmerDataset:
             lang_folder = "Arapaho"
         elif language == "ntu":
             lang_folder = "Natugu"
+        elif language == "lez":
+            lang_folder = "Lezgi"
+        elif language == "nyb":
+            lang_folder = "Nyangbo"
+        elif language == "usp":
+            lang_folder = "Uspanteko"
         else:
             raise ValueError("Bad language input.")
 
         self.train_orig_path = pathlib.Path("data") / lang_folder / f"{self.language}-train-track1-uncovered"
         self.dev_orig_path = pathlib.Path("data") / lang_folder / f"{self.language}-dev-track1-uncovered"
+        self.test_orig_path = pathlib.Path("data") / lang_folder / f"{self.language}-test-track1-covered"
 
         self.train = self.get_train_entries()
         self.dev = self.get_dev_entries()
+        self.test = self.get_test_entries()
 
     @staticmethod
     def _get_entry_dict(entry: str) -> dict:
@@ -64,3 +72,10 @@ class EnglishStemmerDataset:
         dev_entries = [self._get_entry_dict(entry) for entry in dev_entries]
 
         return [self._tokenize_entry(e) for e in dev_entries]
+
+    def get_test_entries(self):
+        test_text = self.test_orig_path.read_text().strip()
+        test_entries = test_text.split("\n\n")
+        test_entries = [self._get_entry_dict(entry) for entry in test_entries]
+
+        return [self._tokenize_entry(e) for e in test_entries]

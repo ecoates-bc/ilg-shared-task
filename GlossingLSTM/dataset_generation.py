@@ -17,7 +17,7 @@ def flatten_gloss_sentences(gloss_elems: list):
     return flat_glosses
 
 
-def save_dataset_files(language: str, window: int, train_ds: list, dev_ds: list):
+def save_dataset_files(language: str, window: int, train_ds: list, dev_ds: list, test_ds: list):
     train_sources = [elem["src"] for elem in train_ds]
     train_sources = flatten_src_sentences(train_sources)
     train_glosses = [elem["gloss"] for elem in train_ds]
@@ -27,6 +27,9 @@ def save_dataset_files(language: str, window: int, train_ds: list, dev_ds: list)
     dev_sources = flatten_src_sentences(dev_sources)
     dev_glosses = [elem["gloss"] for elem in dev_ds]
     dev_glosses = flatten_gloss_sentences(dev_glosses)
+
+    test_sources = [elem["src"] for elem in test_ds]
+    test_sources = flatten_src_sentences(test_sources)
 
     data_folder = pathlib.Path(f"{language}-w{window}-fairseq-data")
     data_folder.mkdir(exist_ok=True)
@@ -43,15 +46,20 @@ def save_dataset_files(language: str, window: int, train_ds: list, dev_ds: list)
     dev_gloss_path = data_folder / f"{language}-w{window}-dev.gloss"
     dev_gloss_path.write_text("\n".join(dev_glosses))
 
+    test_src_path = data_folder / f"{language}-w{window}-test.src"
+    test_src_path.write_text("\n".join(test_sources))
+
     return data_folder
 
 
-def save_stemmer_dataset_files(language: str, train_ds: list, dev_ds: list):
+def save_stemmer_dataset_files(language: str, train_ds: list, dev_ds: list, test_ds: list):
     train_sources = [elem["src"] for elem in train_ds]
     train_stems = [elem["stems"] for elem in train_ds]
 
     dev_sources = [elem["src"] for elem in dev_ds]
     dev_stems = [elem["stems"] for elem in dev_ds]
+
+    test_sources = [elem["src"] for elem in test_ds]
 
     data_folder = pathlib.Path(f"{language}-stemmer-fairseq-data")
     data_folder.mkdir(exist_ok=True)
@@ -67,5 +75,8 @@ def save_stemmer_dataset_files(language: str, train_ds: list, dev_ds: list):
 
     dev_stems_path = data_folder / f"{language}-stemmer-dev.stems"
     dev_stems_path.write_text("\n".join(dev_stems))
+
+    test_stems_path = data_folder / f"{language}-stemmer-test.src"
+    test_stems_path.write_text("\n".join(test_sources))
 
     return data_folder

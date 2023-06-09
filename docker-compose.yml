@@ -1,0 +1,12 @@
+services:
+  torch_cuda:
+    build: .
+    image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    entrypoint: ./docker-entrypoint.sh

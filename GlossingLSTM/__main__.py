@@ -2,6 +2,7 @@ import pathlib
 import subprocess
 import re
 import shutil
+import torch
 
 from GlossingLSTM import (
     WindowedWordDataset,
@@ -14,7 +15,7 @@ from GlossingLSTM import (
 
 def train_window_model(lang: str, window_size: int, batch_size=64, patience=2, lr=0.003, nbest=5):
     dataset = WindowedWordDataset(lang, window_size)
-    data_folder = save_dataset_files(lang, window_size, dataset.train, dataset.dev)
+    data_folder = save_dataset_files(lang, window_size, dataset.train, dataset.dev, dataset.test)
 
     preprocess_folder = pathlib.Path(f"{lang}-w{window_size}-preprocessed")
 
@@ -28,7 +29,7 @@ def train_window_model(lang: str, window_size: int, batch_size=64, patience=2, l
     ]
 
     print(f"Preprocessing model with window={window_size}...")
-    subprocess.run(preprocess_args, stdout=subprocess.PIPE)
+    subprocess.run(preprocess_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print("="*100)
 
     checkpoint_dir = pathlib.Path("checkpoints")
@@ -67,7 +68,7 @@ def train_window_model(lang: str, window_size: int, batch_size=64, patience=2, l
 
 def train_stemmer(lang: str, batch_size=64, patience=2, lr=0.003):
     stemmer_ds = EnglishStemmerDataset(lang)
-    data_folder = save_stemmer_dataset_files(lang, stemmer_ds.train, stemmer_ds.dev)
+    data_folder = save_stemmer_dataset_files(lang, stemmer_ds.train, stemmer_ds.dev, stemmer_ds.test)
 
     preprocess_folder = pathlib.Path(f"{lang}-stemmer-preprocessed")
 
@@ -117,19 +118,21 @@ def train_stemmer(lang: str, batch_size=64, patience=2, lr=0.003):
 
 
 if __name__ == "__main__":
-    LANG = "git"
-    BATCH_SIZE = 32
+    LANG = "ddo"
+    BATCH_SIZE = 128
     PATIENCE = 2
     LR = 0.003
 
-    window2_results, dataset = train_window_model(LANG, 1)
-    window3_results, _ = train_window_model(LANG, 2)
-    model_results = [window2_results, window3_results]
+    print("CUDA status:", torch.cuda.is_available())
 
-    stemmer_results, _ = train_stemmer(LANG)
+    window1_results, dataset = train_window_model(LANG, 1)
+    window2_results, _ = train_window_model(LANG, 2)
+    model_results = [window1_results, window2_results]
+
+    # stemmer_results, _ = train_stemmer(LANG)
 
     saved_path = pathlib.Path("results.txt")
-    save_predictions_file(model_results, stemmer_results, dataset.dev, dataset.get_dev_covered_path(), saved_path)
+    save_predictions_file(model_results, "", dataset.dev, dataset.get_dev_covered_path(), saved_path)
 
     eval_args = [
         "python3",
